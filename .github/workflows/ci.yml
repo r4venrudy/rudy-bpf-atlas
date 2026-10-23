@@ -1,0 +1,45 @@
+name: Build and test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v7
+      - name: Configure
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+      - name: Build
+        run: cmake --build build --config Release --parallel
+      - name: Test
+        run: ctest --test-dir build --build-config Release --output-on-failure
+      - name: Compile and inspect the eBPF example
+        if: runner.os == 'Linux'
+        run: |
+          clang -O2 -g -target bpf -c examples/xdp_allow_all.bpf.c -o build/xdp_allow_all.bpf.o
+          build/rudy-bpf-atlas inspect build/xdp_allow_all.bpf.o --format json > build/example-report.json
+          python3 -c "import json; r=json.load(open('build/example-report.json', encoding='utf-8')); assert r['format']=='ELF64-LE-EM_BPF' and len(r['programs']) == 1 and r['programs'][0]['type']=='xdp'; print('compiled eBPF example inspected successfully')"
+
+  sanitizer:
+    name: Address and undefined behavior sanitizers
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Configure
+        run: cmake -S . -B build-sanitize -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-fsanitize=address,undefined -fno-omit-frame-pointer" -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=address,undefined"
+      - name: Build
+        run: cmake --build build-sanitize --parallel
+      - name: Test
+        run: ctest --test-dir build-sanitize --output-on-failure

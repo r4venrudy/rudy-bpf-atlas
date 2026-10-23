@@ -1,0 +1,6 @@
+/build/
+/out/
+/.tools/
+*.o
+*.bpf.o
+*.sarif

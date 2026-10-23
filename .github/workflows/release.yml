@@ -1,0 +1,67 @@
+name: Package release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: linux-x64
+            os: ubuntu-latest
+          - name: windows-x64
+            os: windows-latest
+          - name: macos-arm64
+            os: macos-14
+    steps:
+      - uses: actions/checkout@v7
+      - name: Configure
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+      - name: Build and test
+        run: |
+          cmake --build build --config Release --parallel
+          ctest --test-dir build --build-config Release --output-on-failure
+      - name: Stage binary
+        shell: bash
+        run: |
+          mkdir -p stage
+          if [[ "$RUNNER_OS" == "Windows" ]]; then cp build/Release/rudy-bpf-atlas.exe stage/; else cp build/rudy-bpf-atlas stage/; fi
+          cp README.md LICENSE stage/
+      - name: Create archive
+        shell: bash
+        run: |
+          if [[ "$RUNNER_OS" == "Windows" ]]; then
+            cd stage
+            cmake -E tar cfv "../rudy-bpf-atlas-${{ matrix.name }}.zip" --format=zip .
+          else
+            tar -czf "rudy-bpf-atlas-${{ matrix.name }}.tar.gz" -C stage .
+          fi
+      - uses: actions/upload-artifact@v7
+        with:
+          name: rudy-bpf-atlas-${{ matrix.name }}
+          path: rudy-bpf-atlas-${{ matrix.name }}.*
+          if-no-files-found: error
+  release:
+    needs: package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          path: assets
+          pattern: rudy-bpf-atlas-*
+          merge-multiple: true
+      - name: Checksums
+        run: cd assets && sha256sum rudy-bpf-atlas-* > SHA256SUMS.txt
+      - uses: softprops/action-gh-release@v3
+        with:
+          generate_release_notes: true
+          prerelease: true
+          files: assets/*

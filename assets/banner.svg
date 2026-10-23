@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="300" viewBox="0 0 1200 300" role="img" aria-labelledby="title desc">
+  <title id="title">Rudy BPF Atlas</title>
+  <desc id="desc">Offline eBPF object inspection for review and CI</desc>
+  <defs>
+    <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M32 0H0V32" fill="none" stroke="#172332" stroke-width="1"/></pattern>
+    <linearGradient id="fade" x1="0" x2="1"><stop offset="0" stop-color="#55e0b6" stop-opacity=".15"/><stop offset="1" stop-color="#55e0b6" stop-opacity="0"/></linearGradient>
+  </defs>
+  <rect width="1200" height="300" rx="24" fill="#0b1118"/>
+  <rect width="1200" height="300" rx="24" fill="url(#grid)"/>
+  <rect x="0" y="0" width="13" height="300" rx="6" fill="#55e0b6"/>
+  <rect x="13" y="0" width="820" height="300" fill="url(#fade)"/>
+  <g font-family="Segoe UI, Arial, sans-serif">
+    <text x="66" y="64" fill="#55e0b6" font-size="17" font-weight="700" letter-spacing="5">RUDY SYSTEMS  /  KERNEL VISIBILITY</text>
+    <text x="62" y="149" fill="#f3f7fb" font-size="62" font-weight="700">BPF Atlas</text>
+    <text x="66" y="196" fill="#b7c8d9" font-size="24">Inspect the object before the kernel sees it.</text>
+    <text x="66" y="255" fill="#55e0b6" font-size="16" font-weight="600" letter-spacing="2">C++20  ·  OFFLINE  ·  ELF / BTF / CO-RE</text>
+  </g>
+  <g transform="translate(890 62)" fill="none" stroke="#55e0b6" stroke-width="3">
+    <rect x="10" y="4" width="230" height="54" rx="10" fill="#101b28"/>
+    <rect x="10" y="91" width="230" height="54" rx="10" fill="#101b28"/>
+    <rect x="10" y="178" width="230" height="54" rx="10" fill="#101b28"/>
+    <path d="M125 58v28m-8-8 8 8 8-8M125 145v28m-8-8 8 8 8-8"/>
+    <g fill="#55e0b6" stroke="none" font-family="Consolas, monospace" font-size="14" text-anchor="middle">
+      <text x="125" y="38">ELF + RELOCATIONS</text><text x="125" y="125">PROGRAM + MAP GRAPH</text><text x="125" y="212">REVIEWABLE REPORT</text>
+    </g>
+  </g>
+</svg>
