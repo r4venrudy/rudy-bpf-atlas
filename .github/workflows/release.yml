@@ -68,6 +68,8 @@ jobs:
           merge-multiple: true
       - name: Checksums
         run: cd assets && sha256sum rudy-bpf-atlas-* > SHA256SUMS.txt
+      - name: Verify release SHA-256 manifest
+        run: python .github/scripts/release_checksums.py assets
       - name: Verify release archive integrity
         run: python .github/scripts/release_guard.py assets
       - uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3
